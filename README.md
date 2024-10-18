@@ -8,4 +8,4 @@
 
 ## Completed
 
-- [x] ARYAN: I am prepare the dataset -- downloading + loading them up in notebook
+- [x] ARYAN: I will prepare the dataset -- downloading + loading them up in notebook
