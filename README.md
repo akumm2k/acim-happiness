@@ -5,4 +5,7 @@
 
 # Feature Request
 
-- [ ] ARYAN: I am prepare the dataset -- downloading + loading them up in notebook
+
+## Completed
+
+- [x] ARYAN: I am prepare the dataset -- downloading + loading them up in notebook
