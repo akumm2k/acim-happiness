@@ -14,3 +14,6 @@
 
 5. **Years of Schooling Worldwide**
    - **Directory:** [related_topics/schooling](/related_topics/schooling/docs_schooling.md)
+
+6. **Weather**
+   - **Directory:** [related_topics/schooling](/related_topics/weather/docs_weather.md)
