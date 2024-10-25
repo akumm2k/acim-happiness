@@ -11,3 +11,6 @@
 
 4. **Worldwide Average IQ Levels**
    - **Directory:** [related_topics/wordwide_iq](/related_topics/wordwide_iq/docs_iq.md) (not time series)
+
+5. **Years of Schooling Worldwide**
+   - **Directory:** [related_topics/schooling](/related_topics/schooling/docs_schooling.md)

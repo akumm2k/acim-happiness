@@ -36,7 +36,6 @@ class IQDataset:
 
         csv_names = os.listdir(path)
         LOGGER.debug(f"Found CSV files: {csv_names}")
-        year_to_df = {}
         
         assert len(csv_names) > 0, (
             "No CSV files found in the downloaded dataset."
@@ -47,4 +46,5 @@ class IQDataset:
         )
         
         data = pd.read_csv(f'{path}/{csv_names[0]}')
+        data = cls(iq_data=data)
         return data
