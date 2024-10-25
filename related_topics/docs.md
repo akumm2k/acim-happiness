@@ -17,3 +17,7 @@
 
 6. **Weather**
    - **Directory:** [related_topics/schooling](/related_topics/weather/docs_weather.md)
+  
+8. **Divorce By Country**
+   - **Directory:** [related_topics/marriage_divorce](/related_topics/marriage_divorce/docs_marriage.md)
+
