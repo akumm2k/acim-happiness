@@ -5,6 +5,20 @@
 
 # Feature Request
 
+## Dataset distribution
+
+- [ ] Mko
+  - [ ] divorce
+  - [ ] iq
+- [ ] Kate
+  - [ ] starbucks
+  - [ ] alcohol
+- [ ] Alen
+  - [ ] schooling
+  - [ ] weather
+- [ ] Aryan
+  - [ ] Coffee
+  - [ ] Meat
 
 ## Completed
 
