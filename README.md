@@ -30,6 +30,13 @@
 How to be happier?
 Ask questions from some student's percpective.
 
+## Charcater sugestion
+Forrest Gump (from Forrest Gump):
+Personality: Simple, sincere, and often unintentionally humorous with his straightforward observations.
+Example Questions:
+"Mama always said life is like a box of chocolates, but does more money mean sweeter happiness?"
+"If I keep running, will I find happiness or just get really tired?"
+
 ## Questions
 
 Where would he move? (gdp, ...) plots of Alen
@@ -55,6 +62,8 @@ Should I stop drinking?
 - Are singles happier in countries with higher average IQs because they enjoy their own company more? (Analyze how IQ levels relate to happiness among single individuals)
 - Are people happier after divorce because they can finally pick the movie without compromise? (Investigate the impact of divorce on personal happiness levels)
 - Is the key to happiness found in marriage, or just in having someone to kill spiders for you? (Examine partnership roles and happiness in marriage)
+
+
 
 
 
