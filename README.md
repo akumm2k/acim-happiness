@@ -30,13 +30,6 @@
 How to be happier?
 Ask questions from some student's percpective.
 
-## Charcater sugestion
-Forrest Gump (from Forrest Gump):
-Personality: Simple, sincere, and often unintentionally humorous with his straightforward observations.
-Example Questions:
-"Mama always said life is like a box of chocolates, but does more money mean sweeter happiness?"
-"If I keep running, will I find happiness or just get really tired?"
-
 ## Questions
 
 Where would he move? (gdp, ...) plots of Alen
