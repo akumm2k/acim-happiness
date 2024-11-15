@@ -239,24 +239,38 @@ class SchoolingDataset(BaseDataset):
     _KAGGLE_DATASET_PATH: str = (
         "iamsouravbanerjee/years-of-schooling-worldwide"
     )
+    _IS_TIME_SERIES = True
 
-    def __getitem__(self, year) -> pd.DataFrame:
-        year_str = str(year)
-        assert re.fullmatch(r"\d{4}", year_str) is not None, (
-            "Year must be a 4-digit number or a 2-digit number that "
-            "can be converted to a 4-digit number by prepending '20'."
-            f" Got {year_str}."
-        )
-        columns = ['ISO3', 'Country', 'Continent', 'Hemisphere',
-                'Human Development Groups', 'UNDP Developing Regions',
-                'HDI Rank (2021)', f'Expected Years of Schooling ({year_str})']
+    def __init__(self, data: pd.DataFrame) -> None:
+        super().__init__(data)
+        # Extract years from column names that match the pattern 'Expected Years of Schooling (YYYY)'
+        self._years = sorted([
+            re.search(r"\((\d{4})\)", col).group(1)
+            for col in data.columns
+            if re.search(r"Expected Years of Schooling \(\d{4}\)", col)
+        ])
         
-        return self._data[columns]
+    def get_years(self) -> List[str]:
+        # Return the list of extracted years
+        return self._years
+
+    def __getitem__(self, year: int) -> pd.DataFrame:
+        year_str = str(year)
+        if not re.fullmatch(r"\d{4}", year_str):
+            raise ValueError(f"Year must be a 4-digit number. Got {year_str}.")
+
+        column_name = f'Expected Years of Schooling ({year_str})'
+        
+        if column_name not in self._data.columns:
+            raise KeyError(f"Year {year_str} not available in dataset.")
+        
+        # Select only the necessary columns
+        return self._data[['ISO3', 'Country', 'Continent', 'Hemisphere',
+                           'Human Development Groups', 'UNDP Developing Regions',
+                           'HDI Rank (2021)', column_name]]
 
     @classmethod
-    def from_kaggle(
-        cls: Type["SchoolingDataset"],
-    ) -> "SchoolingDataset":
+    def from_kaggle(cls: Type["SchoolingDataset"]) -> "SchoolingDataset":
         path = kagglehub.dataset_download(
             SchoolingDataset._KAGGLE_DATASET_PATH
         )
@@ -265,18 +279,91 @@ class SchoolingDataset(BaseDataset):
         csv_names = os.listdir(path)
         LOGGER.debug(f"Found CSV files: {csv_names}")
         
-        assert len(csv_names) > 0, (
-            "No CSV files found in the downloaded dataset."
-        )
-        assert len(csv_names) == 1, (
-            "Expected 1 CSV file in the downloaded dataset. "
-            f"Got {len(csv_names)}."
-        )
-        
-        data = pd.read_csv(f'{path}/{csv_names[0]}')
-        data = cls(data)
-        return data
+        # Validate and load CSV data
+        if len(csv_names) != 1:
+            raise ValueError("Expected one CSV file, found multiple or none.")
 
+        data = pd.read_csv(f'{path}/{csv_names[0]}')
+        instance = cls(data)
+        return instance
+
+
+class WeatherDataset(BaseDataset):
+    _KAGGLE_DATASET_PATH: str = (
+        "guillemservera/global-daily-climate-data"  
+    )
+    _IS_TIME_SERIES = True
+
+    def __init__(self, data: pd.DataFrame) -> None:
+        super().__init__(data)
+        # Ensure the 'date' column is in string format
+        data['date'] = pd.to_datetime(data['date']).dt.strftime('%Y-%m-%d')
+        # Extract years from the 'date' column
+        self._years = sorted(data['date'].apply(lambda x: x[:4]).unique())
+        
+    def get_years(self) -> List[str]:
+        # Return the list of extracted years
+        return self._years
+
+    def __getitem__(self, year: int) -> pd.DataFrame:
+        year_str = str(year)
+        if not re.fullmatch(r"\d{4}", year_str):
+            raise ValueError(f"Year must be a 4-digit number. Got {year_str}.")
+
+        # Filter data for the specified year
+        return self._data[self._data['date'].str.startswith(year_str)]
+
+    @classmethod
+    def from_kaggle(cls: Type["WeatherDataset"]) -> "WeatherDataset":
+        path = kagglehub.dataset_download(
+            WeatherDataset._KAGGLE_DATASET_PATH
+        )
+        LOGGER.debug(f"Downloaded dataset to: {path}")
+
+        # Load the parquet file
+        data = pd.read_parquet(f'{path}/daily_weather.parquet')
+        instance = cls(data)
+        return instance
+class DrugConsumptionDataset(BaseDataset):
+    _KAGGLE_DATASET_PATH: str = "obeykhadija/drug-consumptions-uci"
+
+    def __init__(self, data: pd.DataFrame) -> None:
+        super().__init__(data)
+        # Ensure the 'Age' column is in a standard format if necessary
+        self._ages = sorted(data['Age'].unique())
+        # List of all drugs in the dataset
+        self._drugs = [col for col in data.columns if col not in [
+            "ID", "Age", "Gender", "Education", "Country", "Ethnicity", 
+            "Nscore", "Escore", "Oscore", "Ascore", "Cscore", "Impulsive", "SS"
+        ]]
+
+    def get_ages(self) -> List[int]:
+        # Return the list of unique ages in the dataset
+        return self._ages
+
+    def get_drugs(self) -> List[str]:
+        # Return the list of drug columns in the dataset
+        return self._drugs
+
+    def __getitem__(self, drug: str) -> pd.DataFrame:
+        # Check if the drug is in the list of drugs
+        if drug not in self._drugs:
+            raise ValueError(f"Drug {drug} is not in the dataset.")
+
+        # Return data related to the specified drug
+        return self._data[['ID', 'Age', 'Gender', 'Education', 'Country', 'Ethnicity', drug]]
+
+    @classmethod
+    def from_kaggle(cls: Type["DrugConsumptionDataset"]) -> "DrugConsumptionDataset":
+        path = kagglehub.dataset_download(
+            DrugConsumptionDataset._KAGGLE_DATASET_PATH
+        )
+        LOGGER.debug(f"Downloaded dataset to: {path}")
+
+        # Load the CSV file
+        data = pd.read_csv(f'{path}/Drug_Consumption.csv')
+        instance = cls(data)
+        return instance
 class StarbucksDataset(BaseDataset):
     _KAGGLE_DATASET_PATH_1: str = (
         "kukuroo3/starbucks-locations-worldwide-2021-version"
