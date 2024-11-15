@@ -3,3 +3,7 @@ __pycache__
 
 # data
 src/data/*
+
+# env
+env/*
+.env
