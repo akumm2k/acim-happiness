@@ -18,7 +18,7 @@
   - [ ] weather
 - [ ] Aryan
   - [ ] Coffee
-  - [ ] Meat
+  - [x] Meat
 
 ## Completed
 
@@ -44,7 +44,7 @@ Should I stop drinking?
 - Does social support mean happier people, or just more group projects? (Look into how social connections affect happiness)
 
 ### IQ (Mko)
-- Does having a higher IQ make people happier, or does it just mean more overthinking at 3 a.m.? 
+- Does having a higher IQ make people happier, or does it just mean more overthinking at 3 a.m.?
 - Do higher IQs lead to better life choices and thus more happiness, or just more analysis paralysis? (Explore the relationship between average IQ and happiness scores) (Mko)
 - Do countries that spend more on education have happier citizens, or just students buried under more homework? (Investigate how education expenditure correlates with happiness) (Mko)
 - Is earning more money the key to happiness, or does it just attract more calls from distant relatives? (Examine the link between average income and happiness scores) (Mko)
