@@ -1,26 +1,33 @@
-"""
-Dear friends,
-in merge dataset please look how it works. 
-In short it merges our datasets into happiness dataset.
-As I don't know how you used/processed your datasets, 
-I created a solution where you just make dataset_name_data='to whatever data you used'.
-E.g. merge_datasets(meat_data=my_meat_data) or merge_datasets(schooling_data=my_schooling_data) or merge_datasets(weather_data=my_weather_data) or merge_datasets(alchohol_data=my_alchohol_data)
-"""
-
 from sklearn.pipeline import Pipeline
 import pandas as pd
-from merge_dataset import merge_datasets
+from merge_dataset import merge_datasets, Gen_Synth_Data
 import pandas as pd
 import numpy as np
-
+import os
 
 def prepare_data():
-    # Mock meat_dataset
-    # mock_meat = pd.DataFrame({'country': ['USA', 'UK', 'China'], 'meat': [1, 2, 3]})
+    # if data exists data/final_data.csv, then load it
+    if os.path.exists('data/final_data.csv'):
+        return pd.read_csv('data/final_data.csv')
     
-    # Please add your datas or send them to Mko and he will add them
-    final_data = merge_datasets()
+    # Load the datasets
+    alcohol_data = pd.read_csv('data/alcoholdataset.csv')
+    schooling_data = pd.read_csv('data/schooling_data_long.csv')
+    weather_data = pd.read_csv('data/weather_data.csv')
 
+    # filter schooling data by only using 2021 data
+    schooling_data = schooling_data[schooling_data['Year'] == 2021]
+    
+    meat_data = pd.read_csv('data/meat_data_2023.csv')
+    # Drop city_name column from weather data
+    weather_data = weather_data.drop(columns=['city_name'])
+    # average the weather data by country
+    weather_data = weather_data.groupby('country').mean().reset_index()
+
+    # Please add your datas or send them to Mko and he will add them
+    final_data = merge_datasets(schooling_data=schooling_data, alchohol_data=alcohol_data, meat_data=meat_data, weather_data=weather_data)
+    #  Save the data
+    final_data.to_csv('data/final_data.csv', index=False)
     return final_data
 
 def stratified_split_by_region(data, test_size=0.15, val_size=0.15, random_state=42):
@@ -89,14 +96,49 @@ def stratified_split_by_region(data, test_size=0.15, val_size=0.15, random_state
     val = pd.concat(val_list, ignore_index=True)
     test = pd.concat(test_list, ignore_index=True)
     
+    # save it to csv
+    train.to_csv('data/train_data.csv', index=False)
+    val.to_csv('data/val_data.csv', index=False)
+    test.to_csv('data/test_data.csv', index=False)
     return train, val, test
 
-# Example usage:
+def generate_synth_data(data):
+    """
+    Generate synthetic data by adding Gaussian noise to the numerical columns.
+    
+    Parameters:
+        data (pd.DataFrame): The dataset to generate synthetic data from.
+    
+    Returns:
+        pd.DataFrame: The original dataset with synthetic data appended.
+    """
+    # drop the region, country columns
+    data = data.drop(columns=['region', 'country'])
+    gen = Gen_Synth_Data(data)
+    
+    # if noise data exists data/noise_synthetic_data.csv, then load it
+    synth_noise = gen.generate('noise') if not os.path.exists('data/noise_synthetic_data.csv') else pd.read_csv('data/noise_synthetic_data.csv')
+    # save it to csv if it doesn't exist
+    if not os.path.exists('data/noise_synthetic_data.csv'):
+        synth_noise.to_csv('data/noise_synthetic_data.csv', index=False)
+        
+    synth_ctgan = gen.generate('ctgan') if not os.path.exists('data/ctgan_synthetic_data.csv') else pd.read_csv('data/ctgan_synthetic_data.csv')
+    # save it to csv if it doesn't exist
+    # if not os.path.exists('data/ctgan_synthetic_data.csv'):
+    #     synth_ctgan.to_csv('data/ctgan_synthetic_data.csv', index=False)
+    
+    return synth_noise, synth_ctgan
+
 if __name__ == '__main__':
-    # Assuming 'data' is your DataFrame with 'region' and 'country' columns
     data = prepare_data()  # Replace with your data loading function
+    
+    # Print numerical columns of data
     train, val, test = stratified_split_by_region(data, test_size=0.15, val_size=0.15, random_state=42)
     
+    synth_noise, synth_ctgan = generate_synth_data(train)
+    print(synth_ctgan)
+    # save it to csv
+    synth_noise.to_csv('data/noise_synthetic_data.csv', index=False)
     print(f"Total countries: {data['country'].nunique()}")
     print(f"Train countries: {train['country'].nunique()}")
     print(f"Validation countries: {val['country'].nunique()}")
