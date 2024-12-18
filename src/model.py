@@ -6,7 +6,7 @@ import pickle
 
 class CustomDataPreprocessor:
     
-    drop_columns = ['country', 'Continent_x', 'Continent_y', 'Year', 'year', 'Unnamed: 0', 'latitude', 'longitude', 'altitude']
+    drop_columns = ['country', 'Continent_x', 'Continent_y', 'Year', 'year', 'Unnamed: 0', 'latitude', 'longitude', 'altitude', 'avg_temp_c']
     categorical_columns = ['region', 'Hemisphere']
     binary_categorical_columns = ['beef', 'pig', 'poultry', 'sheep'] # check is_na or not
 
@@ -16,7 +16,7 @@ class CustomDataPreprocessor:
     a_lot_nas = ['beef', 'pig', 'poultry', 'sheep', 'LITRES/CAPITA']
     half_nans = ['avg_income', 'Marriage', 'Divorce', 'Actual', 'Percent']
     one_third_nans = ['rank', 'IQ', 'education_expenditure', 'avg_income', 'avg_temp']
-    small_nas = ['HDI Rank (2021)', 'Expected Years of Schooling', 'avg_temp_c']
+    small_nas = ['HDI Rank (2021)', 'Expected Years of Schooling']
     
     def __init__(self, fill_method={'half_nans': 'median', 'one_third_nans': 'median', 'small_nas': 'mode', 'unclear_columns': 'drop'}):
         
@@ -125,17 +125,17 @@ class CustomDataPreprocessor:
         return self.transform(df)
 
 class CustomModel:
-    model = XGBRegressor(n_estimators=100, max_depth=3, learning_rate=0.1, random_state=42)
+    model = XGBRegressor(n_estimators=250, max_depth=3, learning_rate=0.1, random_state=42)
     
-    data_path: str = 'src/data/noise_synthetic_data.csv'
+    data_path: str = 'data/noise_synthetic_data.csv'
     target_column = 'happiness_score'
-    model_path = 'src/data/model.pkl'
+    model_path = 'data/model.pkl'
     
     DEBUG = False
     
     def __init__(self):
         self.preprocessor = CustomDataPreprocessor()
-        
+        self.train()
     
     def preprocess_fit_tranform(self, X):
         return self.preprocessor.fit_transform(X)
@@ -186,19 +186,13 @@ class CustomModel:
             
             if self.DEBUG:
                 print("X after preprocess:", X) 
-                
-        # predict row by row        
+                     
         return self.model.predict(X)
-        
-        # happiness_scores = [self.model.predict(i) for i in X]    
-        # return happiness_scores
     
     
 model = CustomModel()
 
-model.train()
-
-sample = pd.read_csv('src/data/noise_synthetic_data.csv').head(2)
+sample = pd.read_csv('data/noise_synthetic_data.csv').head(2)
 
 print("Sample data:", sample)
 
